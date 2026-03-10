@@ -68,7 +68,7 @@ Format the output EXACTLY as follows using Markdown:
         className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl"
       >
         <div className="flex items-center gap-4 mb-8">
-          <FileQuestion className="w-8 h-8 text-emerald-400" />
+          <FileQuestion className="w-8 h-8 text-orange-400" />
           <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">Mock Test Generator</h2>
         </div>
         <p className="text-gray-400 mb-12 text-lg max-w-2xl">
@@ -84,7 +84,7 @@ Format the output EXACTLY as follows using Markdown:
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g., Organic Chemistry, Linear Algebra..."
-                className="w-full bg-black/40 border border-emerald-500/30 rounded-xl py-4 px-6 text-lg text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                className="w-full bg-black/60 backdrop-blur-xl border border-white/10 hover:border-orange-500/30 rounded-xl py-4 px-6 text-lg text-white placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
                 required
               />
             </div>
@@ -95,7 +95,7 @@ Format the output EXACTLY as follows using Markdown:
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full bg-black/40 border border-emerald-500/30 rounded-xl py-4 px-6 text-lg text-white appearance-none focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  className="w-full bg-black/60 backdrop-blur-xl border border-white/10 hover:border-orange-500/30 rounded-xl py-4 px-6 text-lg text-white appearance-none focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
                 >
                   <option value="Basic (High School)">Basic (High School)</option>
                   <option value="Intermediate (University Level)">Intermediate (University Level)</option>
@@ -114,7 +114,7 @@ Format the output EXACTLY as follows using Markdown:
                 max="20"
                 value={questionCount}
                 onChange={(e) => setQuestionCount(parseInt(e.target.value) || 5)}
-                className="w-full bg-black/40 border border-emerald-500/30 rounded-xl py-4 px-6 text-lg text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                className="w-full bg-black/60 backdrop-blur-xl border border-white/10 hover:border-orange-500/30 rounded-xl py-4 px-6 text-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all shadow-inner"
               />
             </div>
           </div>
@@ -122,19 +122,22 @@ Format the output EXACTLY as follows using Markdown:
           <button
             type="submit"
             disabled={isLoading || !topic.trim()}
-            className="w-full py-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-medium tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+            className="relative overflow-hidden group/btn w-full py-5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white rounded-xl font-medium tracking-wide transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(249,115,22,0.2)]"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-6 h-6 animate-spin" />
-                Generating Test...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-6 h-6" />
-                Create Mock Test
-              </>
-            )}
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:animate-shimmer" />
+            <span className="relative z-10 flex items-center gap-3">
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  Generating Test...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-6 h-6" />
+                  Create Mock Test
+                </>
+              )}
+            </span>
           </button>
         </form>
 
@@ -144,9 +147,12 @@ Format the output EXACTLY as follows using Markdown:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="prose prose-invert prose-lg max-w-none prose-headings:text-emerald-300 prose-a:text-teal-400 bg-black/40 p-8 md:p-12 rounded-2xl border border-white/5"
+              className="relative prose prose-invert prose-lg max-w-none prose-headings:text-orange-300 prose-a:text-amber-400 bg-black/60 backdrop-blur-xl p-8 md:p-12 rounded-3xl border border-white/10 shadow-2xl overflow-hidden"
             >
-              <ReactMarkdown>{mockTest}</ReactMarkdown>
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4wNSkiLz48L3N2Zz4=')] opacity-20 pointer-events-none" />
+              <div className="relative z-10">
+                <ReactMarkdown>{mockTest}</ReactMarkdown>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

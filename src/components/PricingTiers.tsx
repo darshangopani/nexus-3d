@@ -6,8 +6,8 @@ const tiers = [
     name: 'Nexus 3D Scholar+',
     subtitle: 'The Essentials',
     price: '19',
-    color: 'from-blue-500 to-indigo-500',
-    icon: <Sparkles className="w-6 h-6 text-blue-400" />,
+    color: 'from-orange-500 to-amber-500',
+    icon: <Sparkles className="w-6 h-6 text-orange-400" />,
     features: [
       {
         title: 'The "Clear Any Concept" Engine',
@@ -31,8 +31,8 @@ const tiers = [
     name: 'Nexus 3D Elite Pro',
     subtitle: 'The Top 1% Tier',
     price: '49',
-    color: 'from-purple-500 to-pink-500',
-    icon: <Crown className="w-6 h-6 text-purple-400" />,
+    color: 'from-amber-500 to-yellow-500',
+    icon: <Crown className="w-6 h-6 text-amber-400" />,
     popular: true,
     features: [
       {
@@ -92,16 +92,24 @@ export default function PricingTiers() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
-            className={`relative flex flex-col backdrop-blur-xl bg-white/5 border rounded-3xl p-8 transition-all duration-300 hover:-translate-y-2 ${
+            className={`relative flex flex-col backdrop-blur-xl bg-white/5 border rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(245,158,11,0.2)] group overflow-hidden ${
               tier.popular 
-                ? 'border-purple-500/50 shadow-[0_0_40px_rgba(168,85,247,0.15)]' 
-                : 'border-white/10 hover:border-white/20'
+                ? 'border-transparent shadow-[0_0_40px_rgba(245,158,11,0.15)]' 
+                : 'border-white/10 hover:border-orange-500/30'
             }`}
           >
+            {/* Dot grid pattern overlay */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4wNSkiLz48L3N2Zz4=')] opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none" />
+
             {tier.popular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
-                Most Popular
-              </div>
+              <>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-orange-500/50 to-yellow-500/50 -z-10 p-[1px]">
+                  <div className="absolute inset-0 bg-black/80 rounded-3xl backdrop-blur-xl" />
+                </div>
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg z-10">
+                  Most Popular
+                </div>
+              </>
             )}
 
             <div className="flex items-center gap-3 mb-4">
@@ -132,13 +140,14 @@ export default function PricingTiers() {
             </div>
 
             <button
-              className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all ${
+              className={`relative overflow-hidden group/btn w-full py-4 rounded-xl font-bold tracking-wide transition-all ${
                 tier.popular
                   ? `bg-gradient-to-r ${tier.color} text-white hover:opacity-90 shadow-lg`
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              Get Started
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:animate-shimmer" />
+              <span className="relative z-10">Get Started</span>
             </button>
           </motion.div>
         ))}
