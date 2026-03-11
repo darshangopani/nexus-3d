@@ -7,6 +7,7 @@ import History from './pages/History';
 import About from './pages/About';
 import Access from './pages/Access';
 import Features from './pages/Features';
+import Dashboard from './pages/Dashboard';
 import LoginModal from './components/LoginModal';
 import { useAuth } from './contexts/AuthContext';
 import { logout } from './firebase';
@@ -41,6 +42,7 @@ export default function AppRoutes() {
 
         <Routes>
           <Route path="/" element={<Home onLoginClick={() => setIsLoginModalOpen(true)} />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
           <Route path="/about" element={<About />} />

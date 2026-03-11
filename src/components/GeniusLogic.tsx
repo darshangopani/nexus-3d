@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Send, Loader2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
+import { db, auth } from '../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -48,7 +50,21 @@ User Query: "${query}"
         contents: prompt,
       });
 
-      setResponse(res.text || 'No response generated.');
+      const responseText = res.text || 'No response generated.';
+      setResponse(responseText);
+
+      if (auth.currentUser && responseText !== 'No response generated.') {
+        try {
+          await addDoc(collection(db, 'history'), {
+            uid: auth.currentUser.uid,
+            query: query.trim(),
+            response: responseText,
+            createdAt: serverTimestamp(),
+          });
+        } catch (dbError) {
+          console.error('Error saving history to Firestore:', dbError);
+        }
+      }
     } catch (error) {
       console.error('Error generating content:', error);
       setResponse('An error occurred while generating the response. Please try again.');

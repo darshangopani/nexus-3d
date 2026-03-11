@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Github, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
-import { signInWithGoogle } from '../firebase';
+import { useNavigate } from 'react-router-dom';
+import { signInWithGoogle, signInWithGithub } from '../firebase';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,19 +25,37 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
       setIsLoading(false);
       onLoginSuccess();
       onClose();
+      navigate('/dashboard');
     }, 1500);
   };
 
-  const handleSocialLogin = async () => {
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
     setError(null);
     try {
       await signInWithGoogle();
       onLoginSuccess();
       onClose();
+      navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Failed to sign in with Google');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await signInWithGithub();
+      onLoginSuccess();
+      onClose();
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to sign in with GitHub');
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +104,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
 
                 <div className="space-y-3 mb-8">
                   <button
-                    onClick={handleSocialLogin}
+                    onClick={handleGoogleLogin}
                     disabled={isLoading}
                     className="w-full flex items-center justify-center gap-3 bg-white text-black px-4 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
                   >
@@ -97,7 +117,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
                     Continue with Google
                   </button>
                   <button
-                    onClick={handleSocialLogin}
+                    onClick={handleGithubLogin}
                     disabled={isLoading}
                     className="w-full flex items-center justify-center gap-3 bg-[#24292F] text-white px-4 py-3 rounded-xl font-semibold hover:bg-[#24292F]/80 transition-colors disabled:opacity-50"
                   >

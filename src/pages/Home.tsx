@@ -101,7 +101,7 @@ export default function Home({ onLoginClick }: HomeProps) {
                   <ArrowRight className="w-5 h-5 relative z-10" />
                 </button>
               ) : (
-                <a href="#engine" className="relative overflow-hidden group flex items-center gap-2 bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                <a href="/dashboard" className="relative overflow-hidden group flex items-center gap-2 bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                   <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   <span className="relative z-10">Access Logic Engine</span>
                   <ArrowRight className="w-5 h-5 relative z-10" />
@@ -143,29 +143,26 @@ export default function Home({ onLoginClick }: HomeProps) {
         <section id="engine" className="min-h-screen py-24 px-6 relative">
           <div className="max-w-6xl mx-auto">
             {isLoggedIn ? (
-              <>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="backdrop-blur-xl bg-black/40 border border-white/10 rounded-3xl p-16 text-center flex flex-col items-center justify-center shadow-2xl"
+              >
+                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10">
+                  <Sparkles className="w-10 h-10 text-orange-400" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">You're In</h2>
+                <p className="text-gray-400 text-lg max-w-xl mb-8">
+                  Head over to your dashboard to access the Genius Logic Engine, Scout Agent, and Mock Test Creator.
+                </p>
+                <a 
+                  href="/dashboard"
+                  className="bg-white text-black px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                 >
-                  <div className="flex items-center gap-4 mb-8">
-                    <Sparkles className="w-8 h-8 text-orange-400" />
-                    <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">The "Genius" Logic Engine</h2>
-                  </div>
-                  <p className="text-gray-400 mb-12 text-lg max-w-2xl">
-                    Ask any complex question. Our AI will identify the core principle, select a university perspective, and explain it across three levels of depth.
-                  </p>
-                  
-                  <GeniusLogic />
-                </motion.div>
-
-                <ScoutAgent />
-                
-                <MockTestCreator />
-              </>
+                  Go to Dashboard
+                </a>
+              </motion.div>
             ) : (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

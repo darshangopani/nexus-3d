@@ -76,6 +76,14 @@ service cloud.firestore {
              data.createdAt is timestamp;
     }
 
+    function isValidHistory(data) {
+      return hasOnlyAllowedFields(['uid', 'query', 'response', 'createdAt']) &&
+             data.uid is string && data.uid.size() > 0 && data.uid.size() < 128 &&
+             data.query is string && data.query.size() > 0 && data.query.size() < 2000 &&
+             data.response is string && data.response.size() > 0 && data.response.size() < 50000 &&
+             data.createdAt is timestamp;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -99,6 +107,22 @@ service cloud.firestore {
                     
       // Only admins can delete users
       allow delete: if isAdmin();
+    }
+
+    match /history/{historyId} {
+      // Users can read their own history
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      
+      // Users can create their own history
+      allow create: if isAuthenticated() && 
+                    isValidHistory(request.resource.data) && 
+                    request.resource.data.uid == request.auth.uid;
+      
+      // History is immutable, cannot be updated
+      allow update: if false;
+      
+      // Users can delete their own history
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
     }
   }
 }
