@@ -15,8 +15,7 @@ import MockTestCreator from '../components/MockTestCreator';
 import PricingTiers from '../components/PricingTiers';
 import { ChevronDown, Sparkles, BrainCircuit, GraduationCap, Layers, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase';
-import { doc, getDocFromServer } from 'firebase/firestore';
+import { supabase } from '../supabase';
 
 interface HomeProps {
   onLoginClick: () => void;
@@ -32,11 +31,12 @@ export default function Home({ onLoginClick }: HomeProps) {
   useEffect(() => {
     async function testConnection() {
       try {
-        await getDocFromServer(doc(db, 'test', 'connection'));
-      } catch (error) {
-        if(error instanceof Error && error.message.includes('the client is offline')) {
-          console.error("Please check your Firebase configuration. ");
+        const { error } = await supabase.from('users').select('id').limit(1);
+        if (error) {
+          console.error("Please check your Supabase configuration: ", error.message);
         }
+      } catch (err) {
+        console.error("Connection error.", err);
       }
     }
     testConnection();

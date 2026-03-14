@@ -1,13 +1,30 @@
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
+import { ADSTERRA_KEY } from '../utils/config';
 
 interface AdsterraAdProps {
   format: '728x90' | '300x250' | '160x600';
 }
 
 export default function AdsterraAd({ format }: AdsterraAdProps) {
-  // In a real implementation, this would contain the Adsterra script tags
-  // For the open-source platform, we provide a placeholder where users can inject their Adsterra API keys/scripts.
-  
+  useEffect(() => {
+    if (!ADSTERRA_KEY) return;
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = `//www.profitabledisplaynetwork.com/${ADSTERRA_KEY}/invoke.js`;
+    
+    // Inject at the end of the body
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   const dimensions = {
     '728x90': 'w-full max-w-[728px] h-[90px]',
     '300x250': 'w-[300px] h-[250px]',
@@ -16,14 +33,13 @@ export default function AdsterraAd({ format }: AdsterraAdProps) {
 
   return (
     <motion.div 
-      whileHover={{ scale: 1.02 }}
-      className={`mx-auto ${dimensions[format]} bg-white/5 border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-gray-500 relative overflow-hidden group`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={`mx-auto ${dimensions[format]} bg-black/20 border border-white/5 rounded-xl flex items-center justify-center text-gray-600 overflow-hidden relative`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <span className="font-mono text-sm tracking-widest uppercase mb-2">Adsterra Ad Space</span>
-      <span className="font-mono text-xs opacity-50">{format}</span>
-      <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-wider opacity-30">
-        Insert Script Here
+      <div id={`container-${ADSTERRA_KEY}`} className="relative z-10" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-[10px] uppercase tracking-[0.3em] opacity-20">Secure Ad Network Active</span>
       </div>
     </motion.div>
   );

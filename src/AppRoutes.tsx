@@ -9,8 +9,9 @@ import Access from './pages/Access';
 import Features from './pages/Features';
 import Dashboard from './pages/Dashboard';
 import LoginModal from './components/LoginModal';
+import AdsterraGlobal from './components/AdsterraGlobal';
 import { useAuth } from './contexts/AuthContext';
-import { logout } from './firebase';
+import { supabase } from './supabase';
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ export default function AppRoutes() {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await supabase.auth.signOut();
     } catch (error) {
       console.error("Failed to log out", error);
     }
@@ -33,6 +34,8 @@ export default function AppRoutes() {
           onLogin={() => setIsLoginModalOpen(true)} 
           onLogout={handleLogout} 
         />
+        
+        <AdsterraGlobal />
 
         <LoginModal 
           isOpen={isLoginModalOpen} 

@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Book, GraduationCap, FileText, Search } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
-import { db, auth } from '../firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { GEMINI_API_KEY } from '../utils/config';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+type Mode = 'concept' | 'university' | 'pdf';
 
 export default function GeniusLogic() {
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
+  const [activeMode, setActiveMode] = useState<Mode>('concept');
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
 
@@ -21,28 +26,20 @@ export default function GeniusLogic() {
     setResponse(null);
 
     try {
+      let systemPrompt = '';
+      
+      if (activeMode === 'concept') {
+        systemPrompt = `You are a world-class educator. Provide the BEST and SIMPLEST explanation for the given topic. Focus on clarity and core intuition. Use Markdown.`;
+      } else if (activeMode === 'university') {
+        systemPrompt = `You are an academic researcher. Explain how top universities (like MIT, IIT, Stanford, Harvard) specifically approach the following topic. Highlight the pedagogical differences. Use Markdown.`;
+      } else if (activeMode === 'pdf') {
+        systemPrompt = `You are a research librarian. Recommend the best textbooks, research papers, and PDF resources for the following topic. Provide titles and brief descriptions of why they are essential. Use Markdown.`;
+      }
+
       const prompt = `
-You are the "Genius Logic Engine". The user will ask a question or provide a topic.
-You must use a Chain-of-Thought (CoT) structure and respond EXACTLY in the following format using Markdown:
-
-## 1. Core Principle
-[Identify and briefly explain the core principle of the topic, e.g., Quantum Entanglement, Thermodynamics, etc.]
-
-## 2. University Perspective
-[Select a specific university perspective (e.g., MIT's focus on mathematical derivation vs. Harvard's focus on conceptual theory) and explain how they approach this topic.]
-
-## 3. Explanations
-
-### Basic (ELI5)
-[Explain the topic as if the user is 5 years old. Use simple analogies.]
-
-### Intermediate (University Level)
-[Explain the topic at an undergraduate university level. Introduce key terms and standard concepts.]
-
-### Advanced (Research Level)
-[Explain the topic at a cutting-edge research level. Discuss current challenges, advanced theories, or mathematical frameworks.]
-
-User Query: "${query}"
+        ${systemPrompt}
+        
+        User Query: "${query}"
       `;
 
       const res = await ai.models.generateContent({
@@ -53,37 +50,66 @@ User Query: "${query}"
       const responseText = res.text || 'No response generated.';
       setResponse(responseText);
 
-      if (auth.currentUser && responseText !== 'No response generated.') {
+      if (user && responseText !== 'No response generated.') {
         try {
-          await addDoc(collection(db, 'history'), {
-            uid: auth.currentUser.uid,
-            query: query.trim(),
-            response: responseText,
-            createdAt: serverTimestamp(),
-          });
+          await supabase
+            .from('history')
+            .insert({
+              user_id: user.id,
+              query: `[${activeMode.toUpperCase()}] ${query.trim()}`,
+              response: responseText,
+              q_type: 'custom'
+            });
         } catch (dbError) {
-          console.error('Error saving history to Firestore:', dbError);
+          console.error('Error saving history to Supabase:', dbError);
         }
       }
     } catch (error) {
       console.error('Error generating content:', error);
-      setResponse('An error occurred while generating the response. Please try again.');
+      setResponse('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const tabs = [
+    { id: 'concept', label: 'Concept Search', icon: Book, placeholder: 'Search any concept...' },
+    { id: 'university', label: 'University Intel', icon: GraduationCap, placeholder: 'Search how universities teach...' },
+    { id: 'pdf', label: 'PDF Explorer', icon: FileText, placeholder: 'Find textbooks & research PDFs...' },
+  ];
+
   return (
     <div className="w-full">
+      {/* Tab Switcher */}
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveMode(tab.id as Mode)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-2xl transition-all font-medium ${
+              activeMode === tab.id 
+                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="relative mb-12 group">
         <div className={`absolute -inset-1 bg-gradient-to-r from-orange-500/20 via-amber-500/20 to-yellow-500/20 rounded-[2rem] blur-xl transition duration-1000 ${isLoading ? 'opacity-100 animate-pulse' : 'opacity-50 group-hover:opacity-100 group-hover:duration-200'}`} />
         <div className="relative flex items-center">
+          <div className="absolute left-6 text-gray-500">
+            <Search className="w-6 h-6" />
+          </div>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about Quantum Mechanics, String Theory, Neural Networks..."
-            className="w-full bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl py-6 pl-8 pr-24 text-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 transition-all shadow-2xl"
+            placeholder={tabs.find(t => t.id === activeMode)?.placeholder}
+            className="w-full bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl py-6 pl-16 pr-24 text-xl text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 transition-all shadow-2xl"
           />
           <button
             type="submit"

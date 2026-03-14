@@ -1,8 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, Search, ArrowRight, Loader2, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { db, auth } from '../firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { supabase } from '../supabase';
 import { useAuth } from '../contexts/AuthContext';
 import ReactMarkdown from 'react-markdown';
 
@@ -25,32 +24,33 @@ export default function History() {
       return;
     }
 
-    const q = query(
-      collection(db, 'history'),
-      where('uid', '==', user.uid)
-    );
+    const fetchHistory = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('history')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items: HistoryItem[] = [];
-      snapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() } as HistoryItem);
-      });
-      
-      // Sort locally to avoid needing a composite index
-      items.sort((a, b) => {
-        const timeA = a.createdAt?.toMillis() || 0;
-        const timeB = b.createdAt?.toMillis() || 0;
-        return timeB - timeA;
-      });
-      
-      setHistory(items);
-      setIsLoading(false);
-    }, (error) => {
-      console.error("Error fetching history:", error);
-      setIsLoading(false);
-    });
+        if (error) throw error;
 
-    return () => unsubscribe();
+        // Map Supabase columns to our component state structure
+        const items = data.map(item => ({
+          id: item.id,
+          query: item.query,
+          response: item.response,
+          createdAt: { toDate: () => new Date(item.created_at) } // Mocking Firestore timestamp behavior
+        }));
+
+        setHistory(items);
+      } catch (error) {
+        console.error("Error fetching history:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHistory();
   }, [user]);
 
   const formatDate = (timestamp: any) => {

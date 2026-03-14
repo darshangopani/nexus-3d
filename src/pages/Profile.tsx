@@ -15,10 +15,10 @@ export default function Profile() {
         >
           <div className="flex items-center gap-6 mb-8">
             <div className="w-24 h-24 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-3xl font-bold">
-              {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+              {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">{user?.displayName || 'User'}</h1>
+              <h1 className="text-3xl font-bold mb-2">{user?.email?.split('@')[0] || 'Member'}</h1>
               <div className="flex items-center gap-2 text-gray-400">
                 <Mail className="w-4 h-4" />
                 <span>{user?.email}</span>
@@ -39,7 +39,7 @@ export default function Profile() {
                 <Calendar className="w-5 h-5" />
                 <h3 className="font-semibold">Member Since</h3>
               </div>
-              <p className="text-gray-300">{user?.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'Recently'}</p>
+              <p className="text-gray-300">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Recently'}</p>
             </div>
           </div>
         </motion.div>
