@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileSearch, ShieldAlert, CheckCircle2, Loader2, Globe, BookOpen, ChevronRight } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { GEMINI_API_KEY } from '../utils/config';
 import { supabase } from '../supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
@@ -22,20 +23,35 @@ interface ScoutResult {
 
 export default function ScoutAgent() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isScanning, setIsScanning] = useState(false);
   const [url, setUrl] = useState('');
   const [result, setResult] = useState<ScoutResult | null>(null);
+  const hasAutoScanned = useRef(false);
 
-  const handleScan = async () => {
-    if (!url.trim()) return;
-    
+  useEffect(() => {
+    const scoutUrlParam = searchParams.get('scout_url');
+    if (scoutUrlParam && !hasAutoScanned.current) {
+      setUrl(scoutUrlParam);
+      hasAutoScanned.current = true;
+      // Trigger scan after a brief delay to ensure state and AI are ready
+      const timer = setTimeout(() => {
+        handleAutoScan(scoutUrlParam);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  const performAnalysis = async (targetUrl: string) => {
+    if (!targetUrl.trim()) return;
+
     setIsScanning(true);
     setResult(null);
 
     try {
       const prompt = `
         You are the "Scout Agent", an autonomous intelligence that analyzes educational resources, notes, and exam papers.
-        The user has provided a URL: "${url}"
+        The user has provided a URL: "${targetUrl}"
         
         Analyze this URL (or the resource it likely points to) and provide a detailed scouting report EXACTLY in the following JSON format:
         {
@@ -78,7 +94,7 @@ export default function ScoutAgent() {
         const topicsMd = scoutData.topics.map(t => `#### ${t.title}\n${t.explanation}`).join('\n\n');
         await supabase.from('history').insert({
           user_id: user.id,
-          query: `Detailed Scout Analysis: ${url}`,
+          query: `Detailed Scout Analysis: ${targetUrl}`,
           response: `### Scout Report\n- **Source**: ${scoutData.source}\n- **Difficulty**: ${scoutData.difficulty}\n- **Confidence**: ${scoutData.confidence}%\n\n### Important Topics\n${topicsMd}`,
           q_type: 'custom'
         });
@@ -90,6 +106,17 @@ export default function ScoutAgent() {
     } finally {
       setIsScanning(false);
     }
+  };
+
+  const handleAutoScan = async (scoutUrl: string) => {
+    if (!scoutUrl) return;
+    setUrl(scoutUrl);
+    await performAnalysis(scoutUrl);
+  };
+
+  const handleScan = async () => {
+    if (!url.trim()) return;
+    await performAnalysis(url);
   };
 
   return (
