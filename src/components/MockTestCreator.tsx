@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FileQuestion, Loader2, Settings2, CheckCircle, Code2, Trash2, Send, AlertCircle, XCircle, CheckCircle2 } from 'lucide-react';
+import { FileQuestion, Loader2, Settings2, CheckCircle, Code2, Trash2, Send, AlertCircle, XCircle, CheckCircle2, RotateCcw } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
 import { GEMINI_API_KEY } from '../utils/config';
@@ -24,6 +24,9 @@ export default function MockTestCreator() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [executionResult, setExecutionResult] = useState<Record<number, { stdout: string, stderr: string }>>({});
+  const [isRunning, setIsRunning] = useState<Record<number, boolean>>({});
+  const [selectedLang, setSelectedLang] = useState<Record<number, string>>({});
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +78,36 @@ export default function MockTestCreator() {
   const handleAnswerChange = (id: number, value: string) => {
     if (isSubmitted) return;
     setUserAnswers(prev => ({ ...prev, [id]: value }));
+  };
+
+  const runCode = async (id: number, code: string) => {
+    const lang = selectedLang[id] || 'python';
+    setIsRunning(prev => ({ ...prev, [id]: true }));
+    
+    try {
+      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: lang,
+          version: '*',
+          files: [{ content: code }]
+        })
+      });
+
+      const data = await response.json();
+      setExecutionResult(prev => ({ 
+        ...prev, 
+        [id]: { 
+          stdout: data.run.stdout, 
+          stderr: data.run.stderr 
+        } 
+      }));
+    } catch (error) {
+      console.error('Execution error:', error);
+    } finally {
+      setIsRunning(prev => ({ ...prev, [id]: false }));
+    }
   };
 
   return (
@@ -180,16 +213,51 @@ export default function MockTestCreator() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-amber-400 text-sm mb-2">
-                    <Code2 className="w-4 h-4" />
-                    <span>Programizer Logic Editor</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2 text-amber-400 text-sm">
+                      <Code2 className="w-4 h-4" />
+                      <span>Programizer Logic Editor</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <select 
+                        value={selectedLang[q.id] || 'python'}
+                        onChange={(e) => setSelectedLang(prev => ({ ...prev, [q.id]: e.target.value }))}
+                        className="bg-black/40 border border-white/10 rounded-lg py-1 px-3 text-xs text-gray-300 focus:outline-none"
+                      >
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="cpp">C++</option>
+                        <option value="java">Java</option>
+                      </select>
+                      <button
+                        onClick={() => runCode(q.id, userAnswers[q.id] || '')}
+                        disabled={isRunning[q.id] || !userAnswers[q.id]}
+                        className="flex items-center gap-2 px-4 py-1.5 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white rounded-lg text-xs font-bold transition-all"
+                      >
+                        {isRunning[q.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                        Run Code
+                      </button>
+                    </div>
                   </div>
                   <textarea
                     value={userAnswers[q.id] || ''}
                     onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                     placeholder="// Implement your solution here..."
-                    className="w-full h-40 bg-black/80 font-mono text-emerald-400 p-4 rounded-xl border border-white/10 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
+                    className="w-full h-48 bg-black/80 font-mono text-emerald-400 p-4 rounded-xl border border-white/10 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/20"
                   />
+                  
+                  {/* Console Output */}
+                  {executionResult[q.id] && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="mt-4 p-4 bg-black rounded-xl border border-white/5 font-mono text-sm"
+                    >
+                      <div className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 font-bold">Execution Console</div>
+                      {executionResult[q.id].stdout && <pre className="text-gray-200 whitespace-pre-wrap">{executionResult[q.id].stdout}</pre>}
+                      {executionResult[q.id].stderr && <pre className="text-red-400 whitespace-pre-wrap font-bold">{executionResult[q.id].stderr}</pre>}
+                    </motion.div>
+                  )}
                 </div>
               )}
 

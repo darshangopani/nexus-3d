@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import History from './pages/History';
+import Study from './pages/Study';
+import PodPage from './pages/PodPage';
 import About from './pages/About';
 import Features from './pages/Features';
 import Dashboard from './pages/Dashboard';
@@ -47,6 +49,8 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
+          <Route path="/study" element={<Study />} />
+          <Route path="/pod/:podId" element={<PodPage />} />
           <Route path="/about" element={<About />} />
           <Route path="/features" element={<Features />} />
         </Routes>

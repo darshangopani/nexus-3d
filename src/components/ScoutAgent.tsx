@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FileSearch, ShieldAlert, CheckCircle2, Loader2, Globe, BookOpen, ChevronRight } from 'lucide-react';
+import { FileSearch, ShieldAlert, CheckCircle2, Loader2, Globe, BookOpen, ChevronRight, Quote, Share2 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { GEMINI_API_KEY } from '../utils/config';
 import { supabase } from '../supabase';
@@ -19,6 +19,12 @@ interface ScoutResult {
   source: string;
   confidence: number;
   topics: Topic[];
+  metadata?: {
+    title: string;
+    author: string;
+    year: string;
+    journal: string;
+  };
 }
 
 export default function ScoutAgent() {
@@ -64,7 +70,13 @@ export default function ScoutAgent() {
               "explanation": "A concise but thorough explanation of why this topic is important in this resource and what it covers."
             },
             ...
-          ]
+          ],
+          "metadata": {
+            "title": "Clean Title of the Resource",
+            "author": "Primary Author or Organization",
+            "year": "Publication Year (e.g., 2023)",
+            "journal": "Publisher or Journal name"
+          }
         }
         
         Identify at least 3-5 important topics. Provide meaningful explanations for each.
@@ -84,7 +96,8 @@ export default function ScoutAgent() {
         difficulty: analysis.difficulty || 'Moderate (Standard)',
         source: analysis.source || 'Unknown Source',
         confidence: analysis.confidence || 85,
-        topics: analysis.topics || []
+        topics: analysis.topics || [],
+        metadata: analysis.metadata
       };
 
       setResult(scoutData);
@@ -203,6 +216,37 @@ export default function ScoutAgent() {
                     </div>
                   </div>
                 </div>
+
+                {/* AI Citation Manager */}
+                {result.metadata && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="p-6 bg-white/5 border border-white/10 rounded-2xl"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2 text-amber-400 text-sm font-bold uppercase tracking-wider">
+                        <Quote className="w-4 h-4" /> Academic Citations
+                      </div>
+                      <span className="text-[10px] text-gray-500 italic">Auto-generated via AI Metadata Extraction</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        <div className="text-[10px] text-gray-500 font-bold uppercase mb-2">APA Format</div>
+                        <p className="text-sm text-gray-300 italic">
+                          {`${result.metadata.author} (${result.metadata.year}). ${result.metadata.title}. ${result.metadata.journal}.`}
+                        </p>
+                      </div>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        <div className="text-[10px] text-gray-500 font-bold uppercase mb-2">BibTeX</div>
+                        <pre className="text-[10px] text-orange-200/50 overflow-x-auto">
+                          {`@article{cite_key,\n  author = {${result.metadata.author}},\n  title = {${result.metadata.title}},\n  journal = {${result.metadata.journal}},\n  year = {${result.metadata.year}}\n}`}
+                        </pre>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Topics Grid */}
                 <div className="grid grid-cols-1 gap-4">

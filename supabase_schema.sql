@@ -124,6 +124,63 @@ DROP TRIGGER IF EXISTS update_users_updated_at ON public.users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+  -- ------------------------------------------------------------------------------
+  -- 5. Flashcards System
+  -- ------------------------------------------------------------------------------
+
+  CREATE TABLE IF NOT EXISTS public.flashcards (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    difficulty INTEGER DEFAULT 0 NOT NULL,
+    next_review TIMESTAMPTZ DEFAULT now() NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+  );
+
+  ALTER TABLE public.flashcards ENABLE ROW LEVEL SECURITY;
+
+  DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can manage own flashcards') THEN
+          CREATE POLICY "Users can manage own flashcards" ON public.flashcards
+            FOR ALL USING (auth.uid() = user_id)
+            WITH CHECK (auth.uid() = user_id);
+      END IF;
+  END $$;
+
+  -- Grant Permissions (Flashcards)
+  GRANT ALL ON public.flashcards TO postgres, anon, authenticated, service_role;
+
+  -- ------------------------------------------------------------------------------
+  -- 6. Collaborative Study Pods
+  -- ------------------------------------------------------------------------------
+
+  CREATE TABLE IF NOT EXISTS public.pod_messages (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    pod_id TEXT NOT NULL, -- Logical room ID
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    user_name TEXT NOT NULL,
+    query TEXT NOT NULL,
+    response TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now() NOT NULL
+  );
+
+  ALTER TABLE public.pod_messages ENABLE ROW LEVEL SECURITY;
+
+  DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public pod interaction') THEN
+          CREATE POLICY "Public pod interaction" ON public.pod_messages
+            FOR ALL USING (true)
+            WITH CHECK (true);
+      END IF;
+  END $$;
+
+  -- Enable Realtime
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.pod_messages;
+
+  -- Grant Permissions
+  GRANT ALL ON public.pod_messages TO postgres, anon, authenticated, service_role;
+
   -- Grant Permissions (Crucial for Trigger Success)
   GRANT USAGE ON SCHEMA public TO postgres, anon, authenticated, service_role;
   GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres, anon, authenticated, service_role;

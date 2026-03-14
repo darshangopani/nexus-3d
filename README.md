@@ -1,24 +1,25 @@
 <div align="center">
   <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
   
-  # 🚀 Nexus-3D v2.0
-  **The Ultimate AI-Powered Academic Intelligence Platform**
+  # 🚀 Nexus-3D v3.0 (Open Source)
+**The Ultimate AI-Powered Academic Intelligence & Collaboration Platform**
 
-  [Explore Platform](https://ai.studio/apps/0edd104f-6b41-4031-b3b0-0d04222af5a1) • [Report Bug](https://github.com/darshangopani/nexus-3d/issues) • [Request Feature](https://github.com/darshangopani/nexus-3d/issues)
+[Explore Platform](http://localhost:5173) • [Report Bug](https://github.com/darshangopani/nexus-3d/issues) • [Request Feature](https://github.com/darshangopani/nexus-3d/issues)
 </div>
 
 ---
 
 ## 🌟 Overview
-Nexus-3D is a next-generation education platform designed to streamline academic research, document analysis, and test preparation through the power of Google Gemini AI and Supabase.
+Nexus-3D is a next-generation education platform designed to streamline academic research, document analysis, and test preparation. **As of v3.0, the platform is fully open-source and free for all students.**
 
-### ⚡ Key Features (v2.0)
-- **🧠 Genius Logic Engine**: Multi-mode search (Concept, University, PDF) with simplified, high-quality AI explanations.
-- **🛰️ Scout Agent**: Real-time URL analysis. Paste a resource link and get difficulty ratings, source intel, and key topic breakdown instantly.
-- **📝 Interactive Mock Tests**: Generate rigorous MCQs and **"Programizer"** coding challenges with automatic grading and "Scout Intel" feedback.
-- **🛡️ Supabase Integration**: Robust authentication and real-time history persistence.
-- **📱 Progressive UI**: Ultra-premium aesthetics with glassmorphism, animated gradients, and responsive layouts.
-- **💸 Monetization Ready**: Fully integrated with Adsterra (Banner, Popunder, Social Bar).
+### ⚡ Mega Enhancements (v3.0.0)
+- **🗂️ AI Flashcard Lab**: Automatic spaced repetition (Leitner System) deck generation.
+- **🖥️ Live Code Sandbox**: Execute Python, JS, C++, and Java directly within mock tests (Piston API).
+- **🎙️ Voice-to-Logic**: Hands-free search with dictation and integrated AI Text-to-Speech (TTS).
+- **📊 Visual Concept Mapper**: Dynamic mind-maps and flowcharts powered by Mermaid.js.
+- **🤝 Collaborative Study Pods**: Real-time room-based study sharing via Supabase Realtime.
+- **📥 AI Citation Pro**: One-click APA/BibTeX citation generator for academic resources.
+- **🛰️ Nexus Scout Extension v2**: Sidebar-injected intelligence for academic websites.
 
 ---
 
