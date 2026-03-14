@@ -52,9 +52,6 @@ export default function Navbar({ isLoggedIn, onLogin, onLogout }: NavbarProps) {
               <Link to="/about" className={`hover:text-white transition-colors flex items-center gap-2 ${location.pathname === '/about' ? 'text-orange-400' : ''}`}>
                 <Info className="w-4 h-4" /> About
               </Link>
-              <Link to="/access" className={`hover:text-white transition-colors flex items-center gap-2 ${location.pathname === '/access' ? 'text-orange-400' : ''}`}>
-                <Key className="w-4 h-4" /> Access
-              </Link>
               <Link to="/history" className={`hover:text-white transition-colors flex items-center gap-2 ${location.pathname === '/history' ? 'text-orange-400' : ''}`}>
                 <Clock className="w-4 h-4" /> History
               </Link>

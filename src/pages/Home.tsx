@@ -12,7 +12,6 @@ import FeatureGrid from '../components/FeatureGrid';
 import GeniusLogic from '../components/GeniusLogic';
 import ScoutAgent from '../components/ScoutAgent';
 import MockTestCreator from '../components/MockTestCreator';
-import PricingTiers from '../components/PricingTiers';
 import { ChevronDown, Sparkles, BrainCircuit, GraduationCap, Layers, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../supabase';
@@ -185,8 +184,6 @@ export default function Home({ onLoginClick }: HomeProps) {
                 </button>
               </motion.div>
             )}
-
-            <PricingTiers />
           </div>
         </section>
 

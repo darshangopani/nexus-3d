@@ -5,7 +5,6 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import History from './pages/History';
 import About from './pages/About';
-import Access from './pages/Access';
 import Features from './pages/Features';
 import Dashboard from './pages/Dashboard';
 import LoginModal from './components/LoginModal';
@@ -49,7 +48,6 @@ export default function AppRoutes() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/history" element={<History />} />
           <Route path="/about" element={<About />} />
-          <Route path="/access" element={<Access />} />
           <Route path="/features" element={<Features />} />
         </Routes>
       </div>
