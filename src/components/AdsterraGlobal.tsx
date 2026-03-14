@@ -1,22 +1,18 @@
 import { useEffect } from 'react';
-import { ADSTERRA_KEY } from '../utils/config';
 
 export default function AdsterraGlobal() {
   useEffect(() => {
-    if (!ADSTERRA_KEY) return;
-
     // --- Social Bar / Popunder Injection ---
-    // Adsterra usually provides a specific script for global formats.
-    // Based on the user's request, we'll use the provided API key to inject the common invocation script.
+    // Using specific script codes provided by the user
     
     const socialBarScript = document.createElement('script');
     socialBarScript.type = 'text/javascript';
-    socialBarScript.src = `//pl25925324.highrevenuenetwork.com/${ADSTERRA_KEY}/invoke.js`;
+    socialBarScript.src = `https://pl28916247.effectivegatecpm.com/a7/26/13/a726138373c781cfd11b73065d28d44e.js`;
     socialBarScript.async = true;
     
     const popunderScript = document.createElement('script');
     popunderScript.type = 'text/javascript';
-    popunderScript.src = `//pl25925325.highrevenuenetwork.com/${ADSTERRA_KEY}/invoke.js`;
+    popunderScript.src = `https://pl28916244.effectivegatecpm.com/52/5f/fc/525ffca79db6765f7274268dea18ecae.js`;
     popunderScript.async = true;
 
     // Append scripts to the body
