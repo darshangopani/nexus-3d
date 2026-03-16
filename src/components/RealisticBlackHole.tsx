@@ -135,62 +135,60 @@ export default function RealisticBlackHole() {
   });
 
   return (
-    <>
+    <group ref={masterGroupRef} rotation={[0.15, -0.2, 0]}>
       <EffectComposer>
         <Bloom luminanceThreshold={0.1} mipmapBlur intensity={1.5} />
       </EffectComposer>
 
-      <group ref={masterGroupRef} rotation={[0.15, -0.2, 0]}>
-        {/* BACKGROUND DEEP SPACE GLOW */}
-        <Sphere args={[20, 32, 32]} position={[0, 0, -5]}>
-          <meshBasicMaterial color="#050200" transparent opacity={0.6} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+      {/* BACKGROUND DEEP SPACE GLOW */}
+      <Sphere args={[20, 32, 32]} position={[0, 0, -5]}>
+        <meshBasicMaterial color="#050200" transparent opacity={0.6} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+      </Sphere>
+
+      {/* The Void (Event Horizon) */}
+      <Sphere args={[2, 64, 64]}>
+        <meshBasicMaterial color="#000000" />
+      </Sphere>
+
+      {/* Photon Ring / Gravitational Lensing Halo */}
+      <group>
+        <Sphere args={[2.08, 64, 64]}>
+          <meshBasicMaterial color="#ffcc55" transparent opacity={0.25} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
         </Sphere>
-
-        {/* The Void (Event Horizon) */}
-        <Sphere args={[2, 64, 64]}>
-          <meshBasicMaterial color="#000000" />
+        <Sphere args={[2.2, 64, 64]}>
+          <meshBasicMaterial color="#ff6600" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
         </Sphere>
-
-        {/* Photon Ring / Gravitational Lensing Halo */}
-        <group>
-          <Sphere args={[2.08, 64, 64]}>
-            <meshBasicMaterial color="#ffcc55" transparent opacity={0.25} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
-          </Sphere>
-          <Sphere args={[2.2, 64, 64]}>
-            <meshBasicMaterial color="#ff6600" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
-          </Sphere>
-          <Sphere args={[2.4, 64, 64]}>
-            <meshBasicMaterial color="#aa3300" transparent opacity={0.05} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
-          </Sphere>
-          {/* Lensing distortion representation (the bent light over the top) */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[2.3, 0.5, 64, 100]} />
-            <meshBasicMaterial color="#ffaa00" transparent opacity={0.08} blending={THREE.AdditiveBlending} />
-          </mesh>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[2.6, 0.3, 64, 100]} />
-            <meshBasicMaterial color="#ff5500" transparent opacity={0.04} blending={THREE.AdditiveBlending} />
-          </mesh>
-        </group>
-
-        {/* Accretion Disk */}
-        <points ref={diskRef}>
-          <bufferGeometry>
-            <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
-            <bufferAttribute attach="attributes-customColor" count={colors.length / 3} array={colors} itemSize={3} />
-            <bufferAttribute attach="attributes-size" count={sizes.length} array={sizes} itemSize={1} />
-            <bufferAttribute attach="attributes-angle" count={angles.length} array={angles} itemSize={1} />
-          </bufferGeometry>
-          <shaderMaterial
-            vertexShader={vertexShader}
-            fragmentShader={fragmentShader}
-            uniforms={uniforms}
-            transparent
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </points>
+        <Sphere args={[2.4, 64, 64]}>
+          <meshBasicMaterial color="#aa3300" transparent opacity={0.05} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
+        </Sphere>
+        {/* Lensing distortion representation (the bent light over the top) */}
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[2.3, 0.5, 64, 100]} />
+          <meshBasicMaterial color="#ffaa00" transparent opacity={0.08} blending={THREE.AdditiveBlending} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[2.6, 0.3, 64, 100]} />
+          <meshBasicMaterial color="#ff5500" transparent opacity={0.04} blending={THREE.AdditiveBlending} />
+        </mesh>
       </group>
-    </>
+
+      {/* Accretion Disk */}
+      <points ref={diskRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={positions.length / 3} array={positions} itemSize={3} />
+          <bufferAttribute attach="attributes-customColor" count={colors.length / 3} array={colors} itemSize={3} />
+          <bufferAttribute attach="attributes-size" count={sizes.length} array={sizes} itemSize={1} />
+          <bufferAttribute attach="attributes-angle" count={angles.length} array={angles} itemSize={1} />
+        </bufferGeometry>
+        <shaderMaterial
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={uniforms}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </points>
+    </group>
   );
 }

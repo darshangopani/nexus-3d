@@ -48,7 +48,7 @@ export default function Home({ onLoginClick }: HomeProps) {
 
       {/* 3D Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 12], fov: 45 }}>
+        <Canvas camera={{ position: [0, 0, 12], fov: 45 }} onCreated={() => console.log('[v0] Canvas initialized')}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
